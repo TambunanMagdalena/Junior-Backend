@@ -55,6 +55,36 @@ class BookController {
       });
     }
   }
+
+  static async createBook(req, res) {
+    try {
+      const { title, author, published_year, stock = 0, isbn } = req.body;
+
+      const result = await BookService.createBook({
+        title,
+        author,
+        published_year,
+        stock,
+        isbn,
+      });
+
+      if (!result.success) {
+        return res.status(400).json({
+          error: result.error,
+        });
+      }
+
+      res.status(201).json({
+        message: "Book created successfully",
+        data: result.data,
+      });
+    } catch (error) {
+      console.error("BookController - createBook error:", error);
+      res.status(500).json({
+        error: "Internal server error",
+      });
+    }
+  }
 }
 
 module.exports = BookController;

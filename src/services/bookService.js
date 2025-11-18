@@ -52,6 +52,47 @@ class BookService {
     }
   }
 
+  static async createBook(bookData) {
+    try {
+      if (
+        !bookData.title ||
+        !bookData.author ||
+        !bookData.published_year ||
+        !bookData.isbn
+      ) {
+        return {
+          success: false,
+          error: "Title, author, published_year, and isbn are required",
+        };
+      }
+
+      if (bookData.stock < 0) {
+        return {
+          success: false,
+          error: "Stock cannot be negative",
+        };
+      }
+
+      const newBook = await Book.create(bookData);
+
+      return {
+        success: true,
+        data: newBook,
+      };
+    } catch (error) {
+      console.error("BookService - createBook error:", error);
+
+      if (error.message.includes("UNIQUE constraint")) {
+        return {
+          success: false,
+          error: "ISBN already exists",
+        };
+      }
+
+      throw new Error("Failed to create book");
+    }
+  }
+
   static async decreaseStock(bookId) {
     try {
       const book = await Book.findById(bookId);
